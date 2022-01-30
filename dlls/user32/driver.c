@@ -208,6 +208,10 @@ static void CDECL nulldrv_ReleaseDC( HWND hwnd, HDC hdc )
 {
 }
 
+static void CDECL nulldrv_SetActiveWindow( HWND hwnd )
+{
+}
+
 static void CDECL nulldrv_SetCapture( HWND hwnd, UINT flags )
 {
 }
@@ -364,6 +368,11 @@ static BOOL CDECL loaderdrv_UpdateLayeredWindow( HWND hwnd, const UPDATELAYEREDW
     return load_driver()->pUpdateLayeredWindow( hwnd, info, window_rect );
 }
 
+static void CDECL loaderdrv_UpdateCandidatePos( HWND hwnd, const RECT *caret_rect )
+{
+    load_driver()->pUpdateCandidatePos( hwnd, caret_rect );
+}
+
 static struct user_driver_funcs lazy_load_driver =
 {
     { NULL },
@@ -398,6 +407,7 @@ static struct user_driver_funcs lazy_load_driver =
     nulldrv_MsgWaitForMultipleObjectsEx,
     nulldrv_ReleaseDC,
     NULL,
+    nulldrv_SetActiveWindow,
     nulldrv_SetCapture,
     nulldrv_SetFocus,
     loaderdrv_SetLayeredWindowAttributes,
@@ -416,6 +426,8 @@ static struct user_driver_funcs lazy_load_driver =
     NULL,
     /* vulkan support */
     NULL,
+    /* candidate pos functions */
+    loaderdrv_UpdateCandidatePos,
     /* thread management */
     nulldrv_ThreadDetach
 };

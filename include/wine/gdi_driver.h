@@ -301,6 +301,7 @@ struct user_driver_funcs
     DWORD   (CDECL *pMsgWaitForMultipleObjectsEx)(DWORD,const HANDLE*,DWORD,DWORD,DWORD);
     void    (CDECL *pReleaseDC)(HWND,HDC);
     BOOL    (CDECL *pScrollDC)(HDC,INT,INT,HRGN);
+    void    (CDECL *pSetActiveWindow)(HWND);
     void    (CDECL *pSetCapture)(HWND,UINT);
     void    (CDECL *pSetFocus)(HWND);
     void    (CDECL *pSetLayeredWindowAttributes)(HWND,COLORREF,BYTE,DWORD);
@@ -319,8 +320,13 @@ struct user_driver_funcs
                                        const RECT *,struct window_surface*);
     /* system parameters */
     BOOL    (CDECL *pSystemParametersInfo)(UINT,UINT,void*,UINT);
+
     /* vulkan support */
     const struct vulkan_funcs * (CDECL *pwine_get_vulkan_driver)(UINT);
+
+    /* IME functions */
+    void    (CDECL *pUpdateCandidatePos)(HWND, const RECT *);
+
     /* thread management */
     void    (CDECL *pThreadDetach)(void);
 };

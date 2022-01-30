@@ -194,6 +194,7 @@ todo_wine
 static void test_GetModuleInformation(void)
 {
     HMODULE hMod = GetModuleHandleA(NULL);
+    DWORD *tmp, counter = 0;
     MODULEINFO info;
     DWORD ret;
 
@@ -213,10 +214,21 @@ static void test_GetModuleInformation(void)
     GetModuleInformation(hpQV, hMod, &info, sizeof(info)-1);
     ok(GetLastError() == ERROR_INSUFFICIENT_BUFFER, "expected error=ERROR_INSUFFICIENT_BUFFER but got %d\n", GetLastError());
 
-    SetLastError(0xdeadbeef);
     ret = GetModuleInformation(hpQV, hMod, &info, sizeof(info));
     ok(ret == 1, "failed with %d\n", GetLastError());
     ok(info.lpBaseOfDll == hMod, "lpBaseOfDll=%p hMod=%p\n", info.lpBaseOfDll, hMod);
+
+    hMod = LoadLibraryA("shell32.dll");
+    ok(hMod != NULL, "Failed to load shell32.dll, error: %u\n", GetLastError());
+
+    ret = GetModuleInformation(hpQV, hMod, &info, sizeof(info));
+    ok(ret == 1, "failed with %d\n", GetLastError());
+    info.SizeOfImage /= sizeof(DWORD);
+    for (tmp = (DWORD *)hMod; info.SizeOfImage; info.SizeOfImage--)
+        counter ^= *tmp++;
+    trace("xor of shell32: %08x\n", counter);
+
+    FreeLibrary(hMod);
 }
 
 static BOOL check_with_margin(SIZE_T perf, SIZE_T sysperf, int margin)
@@ -471,7 +483,6 @@ static void test_GetMappedFileName(void)
     ret = GetMappedFileNameA(GetCurrentProcess(), base, map_name, sizeof(map_name));
     ok(ret, "GetMappedFileName error %d\n", GetLastError());
     ok(ret > strlen(device_name), "map_name should be longer than device_name\n");
-    todo_wine
     ok(memcmp(map_name, device_name, strlen(device_name)) == 0, "map name does not start with a device name: %s\n", map_name);
 
     SetLastError(0xdeadbeef);
@@ -482,7 +493,6 @@ static void test_GetMappedFileName(void)
     {
         ok(memcmp(map_nameW, nt_map_name, lstrlenW(map_nameW)) == 0, "map name does not start with a device name: %s\n", map_name);
         WideCharToMultiByte(CP_ACP, 0, map_nameW, -1, map_name, MAX_PATH, NULL, NULL);
-        todo_wine
         ok(memcmp(map_name, device_name, strlen(device_name)) == 0, "map name does not start with a device name: %s\n", map_name);
     }
 
@@ -490,7 +500,6 @@ static void test_GetMappedFileName(void)
     ret = GetMappedFileNameA(GetCurrentProcess(), base + 0x2000, map_name, sizeof(map_name));
     ok(ret, "GetMappedFileName error %d\n", GetLastError());
     ok(ret > strlen(device_name), "map_name should be longer than device_name\n");
-    todo_wine
     ok(memcmp(map_name, device_name, strlen(device_name)) == 0, "map name does not start with a device name: %s\n", map_name);
 
     SetLastError(0xdeadbeef);
@@ -566,7 +575,7 @@ static void test_GetProcessImageFileName(void)
     {
         /* Windows returns 2*strlen-1 */
         ok(ret >= strlen(szImgPath), "szImgPath=\"%s\" ret=%d\n", szImgPath, ret);
-        todo_wine ok(!strcmp(szImgPath, szMapPath), "szImgPath=\"%s\" szMapPath=\"%s\"\n", szImgPath, szMapPath);
+        ok(!strcmp(szImgPath, szMapPath), "szImgPath=\"%s\" szMapPath=\"%s\"\n", szImgPath, szMapPath);
     }
 
     SetLastError(0xdeadbeef);
@@ -803,6 +812,8 @@ static void test_QueryWorkingSetEx(void)
     DWORD prot;
     BOOL ret;
 
+    static char tmp_data[0x2000] = { 0x41 };
+
     if (pQueryWorkingSetEx == NULL)
     {
         win_skip("QueryWorkingSetEx not found, skipping tests\n");
@@ -821,6 +832,9 @@ static void test_QueryWorkingSetEx(void)
     check_QueryWorkingSetEx(addr, "exe,readonly1", 0, 0, 1, TRUE);
 
     *(volatile char *)addr;
+    check_QueryWorkingSetEx(addr, "exe,readonly2", 1, PAGE_READONLY, 1, FALSE);
+
+    ret = VirtualProtect(addr, 0x1000, PAGE_EXECUTE_READWRITE, &prot);
     ok(ret, "VirtualProtect failed with %d\n", GetLastError());
     check_QueryWorkingSetEx(addr, "exe,readonly2", 1, PAGE_READONLY, 1, FALSE);
 

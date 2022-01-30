@@ -15,6 +15,7 @@ SOURCES = \
 	amsi.idl \
 	amstream.idl \
 	amvideo.idl \
+	apiset.h \
 	appcompatapi.h \
 	appmgmt.h \
 	appmodel.h \
@@ -95,7 +96,9 @@ SOURCES = \
 	cryptuiapi.h \
 	ctfutb.idl \
 	ctxtcall.idl \
+	cuda.h \
 	custcntl.h \
+	cuviddec.h \
 	cvconst.h \
 	cvttyp.idl \
 	d2d1.idl \
@@ -552,12 +555,16 @@ SOURCES = \
 	ntdef.h \
 	ntdsapi.h \
 	ntgdi.h \
+	ntifs.h \
 	ntlsa.h \
 	ntquery.h \
 	ntsecapi.h \
 	ntsecpkg.h \
 	ntstatus.h \
 	ntuser.h \
+	nvapi.h \
+	nvcuvid.h \
+	nvencodeapi.h \
 	oaidl.idl \
 	objbase.h \
 	objectarray.idl \
@@ -784,6 +791,8 @@ SOURCES = \
 	windows.media.devices.idl \
 	windows.media.idl \
 	windows.media.speechsynthesis.idl \
+	windows.networking.idl \
+	windows.networking.connectivity.idl \
 	windows.storage.streams.idl \
 	windows.system.idl \
 	windows.system.userprofile.idl \

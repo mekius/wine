@@ -1366,7 +1366,6 @@ static int cmp_link_name( const void *e1, const void *e2 )
     return strcmp( odp1->link_name, odp2->link_name );
 }
 
-
 /* output the functions for system calls */
 void output_syscalls( DLLSPEC *spec )
 {
@@ -1401,19 +1400,9 @@ void output_syscalls( DLLSPEC *spec )
         switch (target.cpu)
         {
         case CPU_i386:
-            if (UsePIC)
-            {
-                output( "\tcall %s\n", asm_name("__wine_spec_get_pc_thunk_eax") );
-                output( "1:\tmovl %s-1b(%%eax),%%edx\n", asm_name("__wine_syscall_dispatcher") );
-                output( "\tmovl $%u,%%eax\n", id );
-                needs_get_pc_thunk = 1;
-            }
-            else
-            {
-                output( "\tmovl $%u,%%eax\n", id );
-                output( "\tmovl $%s,%%edx\n", asm_name("__wine_syscall") );
-            }
-            output( "\tcall *%%edx\n" );
+            output( "\t.byte 0xb8\n" );                               /* mov eax, SYSCALL */
+            output( "\t.long %d\n", id );
+            output( "\t.byte 0x64,0xff,0x15,0xc0,0x00,0x00,0x00\n" ); /* call dword ptr fs:[0C0h] */
             output( "\tret $%u\n", odp->type == TYPE_STDCALL ? get_args_size( odp ) : 0 );
             break;
         case CPU_x86_64:
@@ -1424,7 +1413,7 @@ void output_syscalls( DLLSPEC *spec )
              * validate that instruction, we can just put a jmp there instead. */
             output( "\t.byte 0x4c,0x8b,0xd1\n" ); /* movq %rcx,%r10 */
             output( "\t.byte 0xb8\n" );           /* movl $i,%eax */
-            output( "\t.long %u\n", id );
+            output( "\t.long %u\n", 0xf000 + id );
             output( "\t.byte 0xf6,0x04,0x25,0x08,0x03,0xfe,0x7f,0x01\n" ); /* testb $1,0x7ffe0308 */
             output( "\t.byte 0x75,0x03\n" );      /* jne 1f */
             output( "\t.byte 0x0f,0x05\n" );      /* syscall */
