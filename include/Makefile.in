@@ -576,6 +576,7 @@ SOURCES = \
 	ntdef.h \
 	ntdsapi.h \
 	ntgdi.h \
+	ntifs.h \
 	ntioring_x.h \
 	ntlsa.h \
 	ntquery.h \
@@ -719,6 +720,7 @@ SOURCES = \
 	srrestoreptapi.h \
 	sspi.h \
 	stamp-h.in \
+	stdole32.idl \
 	stgprop.h \
 	sti.h \
 	storage.h \

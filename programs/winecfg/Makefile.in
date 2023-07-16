@@ -9,8 +9,10 @@ C_SRCS = \
 	audio.c \
 	drive.c \
 	driveui.c \
+	input.c \
 	libraries.c \
 	main.c \
+	staging.c \
 	theme.c \
 	winecfg.c \
 	x11drvdlg.c

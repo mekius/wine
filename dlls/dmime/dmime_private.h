@@ -71,6 +71,9 @@ extern void set_audiopath_perf_pointer(IDirectMusicAudioPath*,IDirectMusicPerfor
 extern void set_audiopath_dsound_buffer(IDirectMusicAudioPath*,IDirectSoundBuffer*);
 extern void set_audiopath_primary_dsound_buffer(IDirectMusicAudioPath*,IDirectSoundBuffer*);
 
+extern IDirectSound *get_dsound_interface(IDirectMusicPerformance8*);
+extern IDirectSoundBuffer *get_segment_buffer(IDirectMusicSegment8 *iface);
+
 /*****************************************************************************
  * Auxiliary definitions
  */

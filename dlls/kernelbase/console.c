@@ -2353,6 +2353,13 @@ void init_console( void )
         if (RtlImageNtHeader( mod )->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI)
             alloc_console( no_window );
     }
-    else if (params->ConsoleHandle && params->ConsoleHandle != CONSOLE_HANDLE_SHELL_NO_WINDOW)
-        create_console_connection( params->ConsoleHandle );
+    else if (params->ConsoleHandle)
+    {
+        HMODULE mod = GetModuleHandleW( NULL );
+        if (params->ConsoleHandle != CONSOLE_HANDLE_SHELL_NO_WINDOW &&
+            RtlImageNtHeader( mod )->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI)
+            create_console_connection( params->ConsoleHandle );
+        else
+            params->ConsoleHandle = NULL;
+    }
 }
